@@ -3,12 +3,14 @@ package com.company;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import java.io.*;
 
+import java.util.Arrays;
 import java.util.Scanner;
-import java.util.Vector;
+
 
 public class Main {
-    static String[][] secondOptionTableRows= new String[999][3];
+    static String[][] secondOptionTableRows = new String[999][4];
     static int rows = 0;
     static int col = 0;
 
@@ -17,7 +19,9 @@ public class Main {
     static int index = 0;
 
     public static void main(String[] args) {
-        while(true) {
+        getRequests();
+
+        while (true) {
             System.out.println("------------------------------------\n" +
                     "   1. Заяви отпуска\n" +
                     "   2. Виж всички отпуски\n" +
@@ -40,7 +44,7 @@ public class Main {
                     printTableForOtherEmployee();
                     break;
                 case 4:
-                    System.out.println("");
+                    changeStatusWithSpecialNumber();
                     break;
                 case 5:
                     exitProgram();
@@ -85,6 +89,67 @@ public class Main {
         }
     }
 
+    public static void writeFile() {
+        BufferedWriter outputWriter = null;
+        try {
+            outputWriter = new BufferedWriter(new FileWriter("filename.txt"));
+            for (int i = 0; i < secondOptionTableRows.length; i++) {
+                for (int j = 0; j < secondOptionTableRows[i].length; j++) {
+
+                    outputWriter.write(secondOptionTableRows[i][j] + " ");
+
+                }
+
+                outputWriter.newLine();
+            }
+
+            outputWriter.flush();
+            outputWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public static void nextIndex() {
+        col++;
+        if (col >= secondOptionTableRows[0].length) {
+            col = 0;
+            rows++;
+        }
+    }
+
+    public static void getRequests() {
+        try {
+            File myObj = new File("filename.txt");
+            Scanner myReader = new Scanner(myObj);
+            while (myReader.hasNextLine()) {
+                String data = myReader.nextLine();
+                if (!data.equals("null null null ")) {
+                    String[] words = data.split("\\s+");
+                    for (int i = 0; i < words.length; i++) {
+                        words[i] = words[i].replaceAll("[^\\w]", "");
+                        secondOptionTableRows[rows][col] = words[i];
+                        nextIndex();
+                    }
+                } else return;
+            }
+            myReader.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+    }
+
+    public static int getNumberLength(int number) {
+        int length = 1;
+        while (number / 10 != 0) {
+            length++;
+            number /= 10;
+        }
+        return length;
+    }
+
     //TODO finish the check of the elements in the first option
     //first Option
     public static void enterDataAndCheckWhetherItIsTrue() {
@@ -98,25 +163,20 @@ public class Main {
         String egn = input.next();
         System.out.print("Вид на отпуската");
         secondOptionTableRows[rows][col] = input.next();
-        col++;
+        nextIndex();
         System.out.println("start");
         secondOptionTableRows[rows][col] = input.next();
-        col++;
+        nextIndex();
         System.out.println("end");
         secondOptionTableRows[rows][col] = input.next();
-        col++;
-        if (col>=3){
-            col = 0;
-            rows++;
-        }
-
+        nextIndex();
+        secondOptionTableRows[rows][col] = "pending";
+        nextIndex();
     }
 
-    //TODO make the connection between the first and the second option and continue to fill the table with information
-    //TODO learn how to make the array endless
     //secondOption
     public static void printTableForYourHolidays() {
-        String[] columnNames = {"Заявки", "Начало(дата)", "Край(дата)"};
+        String[] columnNames = {"Заявки", "Начало(дата)", "Край(дата)", "Статус"};
 
         new doTable(secondOptionTableRows, columnNames);
     }
@@ -130,7 +190,7 @@ public class Main {
         String nameOfEmployee = input.next();
         String[][] employeeRequests = new String[rows][3];
         for (int i = 0; i < names.length; i++) {
-            if (nameOfEmployee.equals(names[i])){
+            if (nameOfEmployee.equals(names[i])) {
                 for (int j = 0; j < 3; j++) {
                     employeeRequests[request][j] = secondOptionTableRows[i][j];
                 }
@@ -141,9 +201,29 @@ public class Main {
     }
 
     //TODO forth option
+    public static void changeStatusWithSpecialNumber() {
+        String[] columnNames = {"Номер", "Заявки", "Начало(дата)", "Край(дата)", "Статус"};
+        String[][] specialNumberTable = new String[rows + 1][5];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < specialNumberTable[i].length; j++) {
+                if (j == 0) {
+                    double specialNumber = Math.pow(10, (specialNumberTable[i].length - 1)) + i;
+                    String specialString = (int) specialNumber + "";
+                    specialNumberTable[i][j] = specialString + "" + j;
+
+                } else {
+                   // System.out.println(secondOptionTableRows[i][j - 1]);
+                    if (!secondOptionTableRows[i][j - 1].equals("null "))
+                    specialNumberTable[i][j] = secondOptionTableRows[i][j - 1];
+                }
+            }
+        }
+        new doTable(specialNumberTable, columnNames);
+    }
 
     //fifth option
     public static void exitProgram() {
+        writeFile();
         System.exit(0);
     }
 
