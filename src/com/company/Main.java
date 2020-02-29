@@ -24,7 +24,7 @@ public class Main {
 
     static int rows = 0;
     static int cols = 0;
-    static int index = 0;
+    static int lastValueOfNamesArrayIndex = 0;
 
     public static void main(String[] args) {
         getRequests();
@@ -117,7 +117,7 @@ public class Main {
         }
     }
 
-    public static void nextIndex() {
+    public static void nextlastValueOfNamesArrayIndex() {
         cols++;
         if (cols >= secondOptionTableRows[0].length) {
             cols = 0;
@@ -134,12 +134,12 @@ public class Main {
             while (myRequest.hasNextLine()) {
                 String data = myRequest.nextLine();
                 String[] words = data.split("\\s+");
-                names[index] = myNames.nextLine();
-                index++;
+                names[lastValueOfNamesArrayIndex] = myNames.nextLine();
+                lastValueOfNamesArrayIndex++;
                 for (int i = 0; i < words.length; i++) {
                     words[i] = words[i].replaceAll("[^\\w]", "");
                     secondOptionTableRows[rows][cols] = words[i];
-                    nextIndex();
+                    nextlastValueOfNamesArrayIndex();
                 }
             }
             myRequest.close();
@@ -153,18 +153,18 @@ public class Main {
     //first Option
     public static void enterDataAndCheckWhetherItIsTrue() {
         System.out.print("Име(само едно име): ");
-        names[index] = input.next();
-        index++;
+        names[lastValueOfNamesArrayIndex] = input.next();
+        lastValueOfNamesArrayIndex++;
         String email = inputAndCheckEmail();
         String egn = inputEgn();
         secondOptionTableRows[rows][cols] = inputAndCheckTypeHoliday();
-        nextIndex();
+        nextlastValueOfNamesArrayIndex();
         secondOptionTableRows[rows][cols] = inputAndCheckFormatStartDate();
-        nextIndex();
+        nextlastValueOfNamesArrayIndex();
         secondOptionTableRows[rows][cols] = inputAndCheckFormatEndDate();
-        nextIndex();
+        nextlastValueOfNamesArrayIndex();
         secondOptionTableRows[rows][cols] = "pending";
-        nextIndex();
+        nextlastValueOfNamesArrayIndex();
     }
 
     public static String inputAndCheckEmail() {
